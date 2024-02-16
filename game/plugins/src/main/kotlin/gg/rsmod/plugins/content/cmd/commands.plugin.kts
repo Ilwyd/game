@@ -1025,7 +1025,7 @@ on_command("varp", Privilege.ADMIN_POWER) {
     val args = player.getCommandArgs()
     tryWithUsage(player, args, "Invalid format! Example of proper command <col=42C66C>::varp 173 1</col>") { values ->
         val varp = values[0].toInt()
-        val state = values[1].toInt()
+        val state = if (values[1] == "max") { 2147483647 } else values[1].toInt()
         val oldState = player.getVarp(varp)
         player.setVarp(varp, state)
         player.message(
@@ -1035,6 +1035,60 @@ on_command("varp", Privilege.ADMIN_POWER) {
                 )
             }</col>", type = ChatMessageType.CONSOLE
         )
+    }
+}
+
+on_command("varps", Privilege.ADMIN_POWER) {
+    val args = player.getCommandArgs()
+    tryWithUsage(player, args, "") { values ->
+        val varpStart = values[0].toInt()
+        val varpEnd = values[1].toInt()
+
+        val value = if (values.size == 3) { values[2].toInt() } else { 2147483647 }
+
+        for (i in varpStart..varpEnd) {
+            try {
+                val oldVarp = player.getVarp(i)
+                player.setVarp(i, value)
+                player.message(
+                    "Set varp (<col=42C66C>$i</col>) from <col=42C66C>$oldVarp</col> to <col=42C66C>${
+                        player.getVarp(
+                            i
+                        )
+                    }</col>", type = ChatMessageType.CONSOLE
+                )
+            }
+            catch (_: Exception) {
+                player.message("Failed to set varp $i", type = ChatMessageType.CONSOLE)
+            }
+        }
+    }
+}
+
+on_command("varbits", Privilege.ADMIN_POWER) {
+    val args = player.getCommandArgs()
+    tryWithUsage(player, args, "") { values ->
+        val varbitStart = values[0].toInt()
+        val varbitEnd = values[1].toInt()
+
+        val value = if (values.size == 3) { values[2].toInt() } else { 2147483647 }
+
+        for (i in varbitStart..varbitEnd) {
+            try {
+                val oldVarbit = player.getVarbit(i)
+                player.setVarbit(i, value)
+                player.message(
+                    "Set varbit (<col=42C66C>$i</col>) from <col=42C66C>$oldVarbit</col> to <col=42C66C>${
+                        player.getVarbit(
+                            i
+                        )
+                    }</col>", type = ChatMessageType.CONSOLE
+                )
+            }
+            catch (_: Exception) {
+                player.message("Failed to set varbit $i", type = ChatMessageType.CONSOLE)
+            }
+        }
     }
 }
 
