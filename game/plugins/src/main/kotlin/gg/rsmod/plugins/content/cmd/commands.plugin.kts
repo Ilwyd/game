@@ -685,6 +685,32 @@ on_command("npc", Privilege.ADMIN_POWER) {
     }
 }
 
+on_command("npcs", Privilege.ADMIN_POWER) {
+    val args = player.getCommandArgs()
+    tryWithUsage(player, args, "Invalid format! Example of proper command <col=42C66C>::npc id walk-radius</col>") { values ->
+        val startId = values[0].toInt()
+        val endId = values[1].toInt()
+        val walkradius = 0
+
+        for (npc in world.npcs.entries) {
+            if (npc == null) continue
+
+            if (npc.tile.z == 2011) {
+                world.remove(npc)
+            }
+        }
+
+        for ((count, id) in (startId..endId).withIndex()) {
+            val npcTile = Tile(2011+count, 2011)
+            val npc = Npc(id, npcTile, world)
+            npc.lock()
+            npc.walkRadius = walkradius
+
+            world.spawn(npc)
+        }
+    }
+}
+
 on_command("removenpc", Privilege.ADMIN_POWER) {
     val chunk = world.chunks.getOrCreate(player.tile)
     val npc =
