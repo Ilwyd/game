@@ -205,8 +205,8 @@ class DefinitionSet {
         val overlayTiles = hashMapOf<Tile, Int>()
         val underlayTiles = hashMapOf<Tile, Int>()
         for (height in 0 until 4) {
-            for (lx in 0 until 8) {
-                for (lz in 0 until 8) {
+            for (lx in 0 until 64) {
+                for (lz in 0 until 64) {
                     val tileSetting = cacheRegion.getTileSetting(height, lx, lz)
                     val tileOverlay = cacheRegion.getOverlayId(height, lx, lz)
                     val tileUnderlay = cacheRegion.getUnderlayId(height, lx, lz)
