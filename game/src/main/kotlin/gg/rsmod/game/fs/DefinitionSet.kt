@@ -202,13 +202,19 @@ class DefinitionSet {
         val blocked = hashSetOf<Tile>()
         val bridges = hashSetOf<Tile>()
         val water = hashSetOf<Tile>()
+        val overlayTiles = hashMapOf<Tile, Int>()
+        val underlayTiles = hashMapOf<Tile, Int>()
         for (height in 0 until 4) {
-            for (lx in 0 until 64) {
-                for (lz in 0 until 64) {
+            for (lx in 0 until 8) {
+                for (lz in 0 until 8) {
                     val tileSetting = cacheRegion.getTileSetting(height, lx, lz)
                     val tileOverlay = cacheRegion.getOverlayId(height, lx, lz)
+                    val tileUnderlay = cacheRegion.getUnderlayId(height, lx, lz)
                     val tileOverlayPath = cacheRegion.getOverlayPath(height, lx, lz)
                     val tile = Tile(cacheRegion.baseX + lx, cacheRegion.baseY + lz, height)
+
+                    overlayTiles[tile] = tileOverlay
+                    underlayTiles[tile] = tileUnderlay
 
                     if ((tileSetting.toInt() and CollisionManager.BLOCKED_TILE) == CollisionManager.BLOCKED_TILE) {
                         blocked.add(tile)
@@ -225,6 +231,8 @@ class DefinitionSet {
                     if (tileOverlay == 112 && tileOverlayPath.toInt() == 0) {
                         water.add(tile)
                     }
+
+
 
                     if ((tileSetting.toInt() and CollisionManager.BRIDGE_TILE) == CollisionManager.BRIDGE_TILE) {
                         bridges.add(tile)
@@ -253,6 +261,12 @@ class DefinitionSet {
         }
         water.forEach { tile ->
             world.chunks.getOrCreate(tile).waterTiles.add(tile)
+        }
+        overlayTiles.forEach { (tile, id) ->
+            world.chunks.getOrCreate(tile).tilesOverlay[tile] = id
+        }
+        underlayTiles.forEach { (tile, id) ->
+            world.chunks.getOrCreate(tile).tilesUnderlay[tile] = id
         }
         world.collision.applyUpdate(blockedTileBuilder.build())
 

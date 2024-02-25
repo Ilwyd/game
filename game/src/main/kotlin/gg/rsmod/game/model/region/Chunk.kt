@@ -9,6 +9,7 @@ import gg.rsmod.game.model.collision.CollisionUpdate
 import gg.rsmod.game.model.entity.*
 import gg.rsmod.game.model.region.update.*
 import gg.rsmod.game.service.GameService
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
@@ -32,6 +33,10 @@ class Chunk(val coords: ChunkCoords, val heights: Int) {
     internal val blockedTiles = ObjectOpenHashSet<Tile>()
 
     internal val waterTiles = ObjectOpenHashSet<Tile>()
+
+    internal val tilesOverlay = Object2IntOpenHashMap<Tile>()
+
+    internal val tilesUnderlay = Object2IntOpenHashMap<Tile>()
 
     /**
      * The [Entity]s that are currently registered to the [Tile] key. This is
@@ -78,6 +83,20 @@ class Chunk(val coords: ChunkCoords, val heights: Int) {
     fun isClipped(tile: Tile): Boolean = matrices[tile.height].isClipped(tile.x % CHUNK_SIZE, tile.z % CHUNK_SIZE)
 
     fun isWater(tile: Tile): Boolean = waterTiles.contains(tile)
+
+    fun getUnderlay(tile: Tile): Int? = tilesUnderlay[tile]
+
+    fun getOverlay(tile: Tile): Int? = tilesOverlay[tile]
+
+    fun addUnderlay(tile: Tile, underlayId: Int) {
+        /*
+         * Create an [UnderlayUpdate] for our local players to receive and view.
+         */
+    }
+
+    fun addOverlay(tile: Tile, overlayId: Int) {
+
+    }
 
     fun addEntity(world: World, entity: Entity, tile: Tile) {
         /*

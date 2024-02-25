@@ -165,6 +165,20 @@ class InstancedMapAllocator {
                         val copyTile = Tile.fromRotatedHash(chunk.packed)
                         val copyChunk = world.chunks.get(copyTile.chunkCoords, createIfNeeded = true)!!
 
+                        copyChunk.tilesOverlay.forEach{ (tile, id) ->
+                            val localX = tile.x % 8
+                            val localZ = tile.z % 8
+                            val newTile = baseTile.transform(localX, localZ)
+                            newChunk.tilesOverlay[newTile] = id
+                        }
+
+                        copyChunk.tilesUnderlay.forEach{ (tile, id) ->
+                            val localX = tile.x % 8
+                            val localZ = tile.z % 8
+                            val newTile = baseTile.transform(localX, localZ)
+                            newChunk.tilesUnderlay[newTile] = id
+                        }
+
                         copyChunk.getEntities<StaticObject>(EntityType.STATIC_OBJECT).forEach { obj ->
                             if (obj.tile.height == chunkH && obj.tile.isInSameChunk(copyTile)) {
                                 val def = obj.getDef(world.definitions)

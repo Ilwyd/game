@@ -8,7 +8,9 @@ import gg.rsmod.game.model.attr.*
 import gg.rsmod.game.model.bits.INFINITE_VARS_STORAGE
 import gg.rsmod.game.model.bits.InfiniteVarsType
 import gg.rsmod.game.model.collision.ObjectType
+import gg.rsmod.game.model.instance.*
 import gg.rsmod.game.model.priv.Privilege
+import gg.rsmod.game.model.region.Chunk
 import gg.rsmod.game.model.region.ChunkCoords
 import gg.rsmod.game.model.timer.ACTIVE_COMBAT_TIMER
 import gg.rsmod.game.service.serializer.PlayerSerializerService
@@ -25,6 +27,67 @@ import gg.rsmod.plugins.content.skills.farming.data.SeedType
 import gg.rsmod.util.Misc
 import java.text.DecimalFormat
 import java.text.NumberFormat
+
+on_command("instance", Privilege.ADMIN_POWER) {
+
+//    val instancedChunkSetBuilder = InstancedChunkSet.Builder()
+//    val bottomLeftX = 3200
+//    val bottomLeftZ = 3200
+//
+//    for (i in 0..5) {
+//        for (j in 0..3) {
+//            for (height in 0..3) {
+//                val tile = Tile(bottomLeftX + (8 * i), bottomLeftZ + (8 * j), height)
+//                instancedChunkSetBuilder.set(i, j, copy = tile)
+//            }
+//        }
+//    }
+//    val instancedChunkSet = instancedChunkSetBuilder.build()
+//
+
+    val topRightChunkCoords = ChunkCoords(315, 387)
+    val bottomRightChunkCoords = ChunkCoords(314, 386)
+    val areaToCopy = Area(bottomRightChunkCoords.toTile().x, bottomRightChunkCoords.toTile().z, topRightChunkCoords.toTile().x + 8, topRightChunkCoords.toTile().z + 8)
+    val instancedChunkSet = generateInstance(areaToCopy)
+
+    val instancedMapConfigurationBuilder = InstancedMapConfiguration.Builder()
+    instancedMapConfigurationBuilder.addAttribute(InstancedMapAttribute.DEALLOCATE_ON_LOGOUT)
+    instancedMapConfigurationBuilder.setOwner(player.uid)
+    instancedMapConfigurationBuilder.setExitTile(world.gameContext.home)
+    val instancedMapConfiguration = instancedMapConfigurationBuilder.build()
+
+    val instancedChunk = world.instanceAllocator.allocate(player.world, instancedChunkSet, instancedMapConfiguration)!!
+    //player.teleportTo(instancedChunk.area.centre)
+    println(instancedChunk.area.bottomLeftX)
+    println(instancedChunk.area.bottomLeftZ)
+}
+
+
+fun generateInstance(mainMapArea: Area): InstancedChunkSet {
+    val numChunksX = (mainMapArea.topRightX - mainMapArea.bottomLeftX) / 8
+    val numChunksZ = (mainMapArea.topRightZ - mainMapArea.bottomLeftZ) / 8
+
+    val instanceChunkSet = InstancedChunkSet.Builder()
+
+    for (x in (0 until numChunksX)) {
+        for (z in (0 until numChunksZ)) {
+            for (height in 0..3) {
+                instanceChunkSet.set(chunkX = (x), chunkZ = (z), height = (height), rot = 0,
+                    copy = Tile(
+                        x = (mainMapArea.bottomLeftX + (x * 8)),
+                        z = (mainMapArea.bottomLeftZ + (z * 8)),
+                        height = (height)
+                    )
+                )
+            }
+        }
+    }
+    return instanceChunkSet.build()
+}
+
+on_command("tile") {
+    player.message(player.tile.toString(), ChatMessageType.CONSOLE)
+}
 
 on_command("male") {
     player.appearance = Appearance.DEFAULT
@@ -425,7 +488,7 @@ on_command("mypos") {
     val tile = player.tile
     if (instancedMap == null) {
         player.message(
-            "Tile=[<col=42C66C>${tile.x}, ${tile.z}, ${tile.height}</col>], Region=${player.tile.regionId}, Chunk Coords=${player.tile.chunkCoords}, Chunk Hash=${player.tile.chunkCoords.hashCode()} Object=${player.world.getObject(tile, ObjectType.INTERACTABLE)}",
+            "Tile=[<col=42C66C>${tile.x}, ${tile.z}, ${tile.height}</col>], Region=${player.tile.regionId}, Chunk Coords=${player.tile.chunkCoords}, Chunk Hash=${player.tile.chunkCoords.hashCode()} Object=${player.world.getObject(tile, ObjectType.FLOOR_DECORATION)}",
             type = ChatMessageType.CONSOLE
         )
     } else {
@@ -435,6 +498,7 @@ on_command("mypos") {
             type = ChatMessageType.CONSOLE
         )
     }
+    player.message("TileOverId=${world.chunks.getOrCreate(tile).getOverlay(tile)} TileUnderId=${world.chunks.getOrCreate(tile).getUnderlay(tile)}", type = ChatMessageType.CONSOLE)
 }
 
 on_command("getmultichunks", Privilege.ADMIN_POWER) {
