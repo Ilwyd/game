@@ -72,7 +72,7 @@ class InstancedMapAllocator {
 
     private fun deallocate(world: World, map: InstancedMap) {
         if (maps.remove(map)) {
-            removeCollision(world, map)
+            removeChunks(world, map)
             world.removeAll(map.area)
 
             /**
@@ -220,13 +220,32 @@ class InstancedMapAllocator {
         }
     }
 
-    private fun removeCollision(world: World, map: InstancedMap) {
-        val regionCount = map.chunks.regionSize
-        val chunks = world.chunks
+    /**
+     * Removes all chunks within an instance area. This results in all of the entities held within the chunks to also be
+     * removed, such as game objects.
+     * It's essentially the same code as what's in [allocate], except it removes chunks instead of adding them.
+     */
+    private fun removeChunks(world: World, map: InstancedMap) {
+        val bounds = Chunk.CHUNKS_PER_REGION * map.chunks.regionSize
+        val heights = Tile.TOTAL_HEIGHT_LEVELS
 
-        for (i in 0 until regionCount) {
-            val tile = map.area.bottomLeft.transform(i * Chunk.REGION_SIZE, i * Chunk.REGION_SIZE)
-            chunks.remove(tile.chunkCoords)
+        for (height in 0 until heights) {
+            for (x in 0 until bounds) {
+                for (z in 0 until bounds) {
+                    val coords = InstancedChunkSet.getCoordinates(x, z, height)
+
+                    val chunkH = (coords shr 28) and 0x3
+                    val chunkX = (coords shr 14) and 0x3FF
+                    val chunkZ = coords and 0x7FF
+
+                    val baseTile = map.area.bottomLeft.transform(chunkX shl 3, chunkZ shl 3, chunkH)
+                    val existingChunk = world.chunks.get(tile = baseTile, createIfNeeded = false)
+
+                    if (existingChunk != null) {
+                        world.chunks.remove(existingChunk.coords)
+                    }
+                }
+            }
         }
     }
 
