@@ -62,7 +62,6 @@ on_command("instance", Privilege.ADMIN_POWER) {
     println(instancedChunk.area.bottomLeftZ)
 }
 
-
 fun generateInstance(mainMapArea: Area): InstancedChunkSet {
     val numChunksX = (mainMapArea.topRightX - mainMapArea.bottomLeftX) / 8
     val numChunksZ = (mainMapArea.topRightZ - mainMapArea.bottomLeftZ) / 8

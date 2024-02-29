@@ -68,6 +68,7 @@ class MessageEncoderSet {
         put(MidiSongEncoder(), MidiSongMessage::class.java)
         put(MapAnimEncoder(), MapAnimMessage::class.java)
         put(LocAnimEncoder(), LocAnimMessage::class.java)
+        put(RebuildRegionEncoder(), RebuildRegionMessage::class.java)
     }
 
     private fun <T : Message> put(encoder: MessageEncoder<T>, message: Class<out T>) {

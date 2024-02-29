@@ -7,6 +7,7 @@ import gg.rsmod.game.message.MessageEncoderSet
 import gg.rsmod.game.message.MessageStructureSet
 import gg.rsmod.game.model.World
 import gg.rsmod.game.task.*
+import gg.rsmod.game.task.parallel.ParallelSynchronizationTask
 import gg.rsmod.game.task.sequential.SequentialNpcCycleTask
 import gg.rsmod.game.task.sequential.SequentialPlayerCycleTask
 import gg.rsmod.game.task.sequential.SequentialPlayerPostCycleTask

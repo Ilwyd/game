@@ -88,16 +88,6 @@ class Chunk(val coords: ChunkCoords, val heights: Int) {
 
     fun getOverlay(tile: Tile): Int? = tilesOverlay[tile]
 
-    fun addUnderlay(tile: Tile, underlayId: Int) {
-        /*
-         * Create an [UnderlayUpdate] for our local players to receive and view.
-         */
-    }
-
-    fun addOverlay(tile: Tile, overlayId: Int) {
-
-    }
-
     fun addEntity(world: World, entity: Entity, tile: Tile) {
         /*
          * Objects will affect the collision map.
@@ -290,6 +280,8 @@ class Chunk(val coords: ChunkCoords, val heights: Int) {
 
         else -> null
     }
+
+    fun toId(height: Int): Int = (coords.z and 0xfff) + ((coords.x and 0xfff) shl 12) + ((height and 0x3) shl 24)
 
     @Suppress("UNCHECKED_CAST")
     fun <T> getEntities(vararg types: EntityType): List<T> = entities.values.flatten().filter { it.entityType in types } as List<T>

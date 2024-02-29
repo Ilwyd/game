@@ -585,6 +585,30 @@ out-packets:
         type: INT
         order: LITTLE
 
+  - message: gg.rsmod.game.message.impl.RebuildRegionMessage # Not yet implemented
+    type: VARIABLE_SHORT
+    opcode: 128
+    structure:
+      - name: player_regions
+        type: BYTES
+      - name: chunk_y
+        type: SHORT
+      - name: map_size
+        type: BYTE
+      - name: force_reload
+        type: BYTE
+        trans: SUBTRACT
+      - name: unknown_byte
+        type: BYTE
+        trans: SUBTRACT
+      - name: chunk_x
+        type: SHORT
+        order: LITTLE
+      - name: chunks
+        type: BYTES
+      - name: xteas
+        type: BYTES
+
 in-packets:
 
   - message: gg.rsmod.game.message.impl.IgnoreMessage # No data

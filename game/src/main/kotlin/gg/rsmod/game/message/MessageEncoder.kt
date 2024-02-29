@@ -3,6 +3,7 @@ package gg.rsmod.game.message
 import gg.rsmod.net.packet.DataType
 import gg.rsmod.net.packet.GamePacket
 import gg.rsmod.net.packet.GamePacketBuilder
+import kotlin.reflect.typeOf
 
 /**
  * Responsible for encoding [Message]s into [GamePacket]s that can be sent to
@@ -18,6 +19,7 @@ abstract class MessageEncoder<T : Message> {
     fun encode(message: T, builder: GamePacketBuilder, structure: MessageStructure) {
         structure.values.values.forEach { value ->
             if (value.type != DataType.BYTES) {
+
                 builder.put(value.type, value.order, value.transformation, extract(message, value.id))
             } else {
                 builder.putBytes(extractBytes(message, value.id))
