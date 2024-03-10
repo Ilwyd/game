@@ -11,8 +11,8 @@ import io.netty.buffer.Unpooled
 class RebuildRegionEncoder : MessageEncoder<RebuildRegionMessage>() {
 
     override fun extract(message: RebuildRegionMessage, key: String): Number = when (key) {
-        "chunkX" -> message.chunkX
-        "chunkZ" -> message.chunkZ
+        "chunk_x" -> message.chunkX
+        "chunk_z" -> message.chunkZ
         "map_size" -> message.mapSize
         "force_reload" -> message.forceReload
         "unknown_byte" -> 3
