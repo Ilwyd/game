@@ -54,6 +54,12 @@ object PlayerPreSynchronizationTask : SynchronizationTask<Player> {
                         }
                     }
 
+                    val playerRegions = IntArray(2048 - 1)
+                    pawn.world.players.forEach {player ->
+                        playerRegions[player.index] = (player.tile.asTileHashMultiplier)
+                    }
+
+                    println("Sending 128")
                     RebuildRegionMessage(
                         chunkX,
                         chunkZ,
@@ -63,7 +69,7 @@ object PlayerPreSynchronizationTask : SynchronizationTask<Player> {
                         xteas.toTypedArray(),
                         playerIndex,
                         playerTile,
-                        null
+                        playerRegions
 
 //                    instance.getCoordinates(pawn.tile),
 //                    xteaService
