@@ -20,3 +20,4 @@ spawn_npc(npc = Npcs.CORDERO, x = 3231, z = 3197, walkRadius = 4, direction = Di
 spawn_npc(npc = Npcs.FINLAY, x = 3245, z = 3157, direction = Direction.SOUTH_EAST, static = true)
 spawn_npc(npc = Npcs.FREMENNIK_SHIPMASTER, x = 3254, z = 3170, direction = Direction.NORTH_EAST, static = true)
 spawn_npc(npc = Npcs.FREMENNIK_WARRIOR_9709, x = 3242, z = 3171, direction = Direction.WEST, static = true)
+spawn_npc(npc = Npcs.XENIA, x = 3244, z = 3198, direction = Direction.EAST, static = true)

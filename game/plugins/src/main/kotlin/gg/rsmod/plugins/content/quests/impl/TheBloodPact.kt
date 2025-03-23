@@ -53,7 +53,7 @@ object TheBloodPact : Quest( // Adds Quest Info
         player.setVarp(QUEST_POINT_VARP, player.getVarp(QUEST_POINT_VARP).plus(pointReward))
         player.buildQuestFinish(
             this,
-            item = Items.SKULL,
+            item = Items.REESES_SWORD,
             rewards =
                 arrayOf(
                     "1 Quest Point",
