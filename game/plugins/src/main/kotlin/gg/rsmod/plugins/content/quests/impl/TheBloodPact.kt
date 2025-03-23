@@ -22,6 +22,7 @@ object TheBloodPact : Quest( // Adds Quest Info
             "XP; access to the Lumbridge Catacombs dungeon",
     pointReward = 1,
     questId = 7238,
+    usesVarbits = true,
     spriteId = 3176,
     slot = 170,
     stages = 60,
