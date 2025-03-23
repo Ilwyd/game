@@ -340,8 +340,7 @@ on_login {
     player.setVarbit(7793, 30)
     // slot 168
     player.setVarbit(8045, 150)
-    // slot 170
-    player.setVarbit(7238, 60)
+    // slot 170 - The Blood Pact
     // slot 171
     player.setVarbit(7958, 90)
     // slot 172
