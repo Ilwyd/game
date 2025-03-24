@@ -22,10 +22,10 @@ fun initialCutscene(player: Player) {
         val bottomLeftZ = instance.area.bottomLeftZ
         player.moveTo(Tile(bottomLeftX + 37, bottomLeftZ + 20, 1))
 
-        val kayle = Npc(Npcs.KAYLE, Tile(bottomLeftX + 36, bottomLeftZ + 28, 1), player.world)
-        val reese = Npc(Npcs.REESE, Tile(bottomLeftX + 37, bottomLeftZ + 27, 1), player.world)
-        val caitlin = Npc(Npcs.CAITLIN, Tile(bottomLeftX + 38, bottomLeftZ + 28, 1), player.world)
-        val ilona = Npc(Npcs.ILONA, Tile(bottomLeftX + 37, bottomLeftZ + 29, 1), player.world)
+        val kayle = Npc(Npcs.KAYLE_9639, Tile(bottomLeftX + 36, bottomLeftZ + 28, 1), player.world)
+        val reese = Npc(Npcs.REESE_9637, Tile(bottomLeftX + 37, bottomLeftZ + 27, 1), player.world)
+        val caitlin = Npc(Npcs.CAITLIN_9638, Tile(bottomLeftX + 38, bottomLeftZ + 28, 1), player.world)
+        val ilona = Npc(Npcs.ILONA_9640, Tile(bottomLeftX + 37, bottomLeftZ + 29, 1), player.world)
 
         world.spawn(kayle)
         world.spawn(reese)
