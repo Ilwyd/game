@@ -3,7 +3,7 @@ import gg.rsmod.plugins.content.quests.impl.TheBloodPact
 import gg.rsmod.plugins.content.quests.startQuest
 import gg.rsmod.plugins.content.quests.startedQuest
 
-on_npc_option(Npcs.XENIA, "Talk-to") {
+on_npc_option(Npcs.XENIA_11476, "Talk-to") {
     player.queue {
         if (!player.startedQuest(TheBloodPact) && player.canStartQuest(TheBloodPact)) {
             this.chatNpc("I'm glad you've come by. I need some help.")
