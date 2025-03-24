@@ -1,4 +1,8 @@
+import gg.rsmod.game.model.instance.InstancedMap
+import gg.rsmod.plugins.content.combat.CombatAnimation
+import gg.rsmod.plugins.content.quests.advanceToNextStage
 import gg.rsmod.plugins.content.quests.finishedQuest
+import gg.rsmod.plugins.content.quests.getCurrentStage
 import gg.rsmod.plugins.content.quests.impl.TheBloodPact
 
 val FADE_IN_INTERFACE = 170
@@ -7,17 +11,27 @@ val FADE_OUT_INTERFACE = 115
 on_obj_option(Objs.CATACOMB_ENTRANCE, "Climb-down") {
     if (player.finishedQuest(TheBloodPact)) {
         player.moveTo(3877, 5526, 1)
-    } else {
-        initialCutscene(player)
+    } else if (player.getCurrentStage(TheBloodPact) == 1) {
+        val instance = buildInstance(player)
+        initialCutscene(player, instance)
+    } else if (player.getCurrentStage(TheBloodPact) == 2) {
+        val instance = buildInstance(player)
+        fightKayle(player, instance)
     }
 }
 
-fun initialCutscene(player: Player) {
-    player.queue {
+fun buildInstance(player: Player): InstancedMap {
+    return world.createTemporaryInstance(player, 15446)!!
+}
+
+fun initialCutscene(
+    player: Player,
+    instance: InstancedMap,
+) {
+    player.lockingQueue { // TODO: Block player input during this sequence. Clicking softlocks the player
         player.openInterface(FADE_OUT_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
         wait(3)
 
-        val instance = world.createTemporaryInstance(player, 15446)!!
         val bottomLeftX = instance.area.bottomLeftX
         val bottomLeftZ = instance.area.bottomLeftZ
         player.moveTo(Tile(bottomLeftX + 37, bottomLeftZ + 20, 1))
@@ -38,7 +52,7 @@ fun initialCutscene(player: Player) {
         player.moveTo(bottomLeftX + 43, bottomLeftZ + 34, 1)
         wait(1)
         kayle.walkTo(this, Tile(bottomLeftX + 36, bottomLeftZ + 32, 1))
-        val reeseRoute = reese.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 37, 1))
+        var reeseRoute = reese.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 37, 1))
         caitlin.walkTo(this, Tile(bottomLeftX + 38, bottomLeftZ + 37, 1))
         ilona.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 38, 1))
         player.openInterface(FADE_IN_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
@@ -101,7 +115,49 @@ fun initialCutscene(player: Player) {
         caitlin.walkTo(this, Tile(bottomLeftX + 38, bottomLeftZ + 42, 1))
         ilona.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 42, 1))
         wait(1)
-        reese.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 41, 1))
+        reeseRoute = reese.walkTo(this, Tile(bottomLeftX + 37, bottomLeftZ + 41, 1))
         player.openInterface(FADE_OUT_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
+        wait { reese.tile == reeseRoute.tail }
+
+        world.remove(reese)
+        world.remove(kayle)
+        world.remove(caitlin)
+        world.remove(ilona)
+
+        player.advanceToNextStage(TheBloodPact)
+        player.resetCamera()
+        fightKayle(player, instance)
+    }
+}
+
+fun fightKayle(
+    player: Player,
+    instance: InstancedMap,
+) {
+    player.openInterface(FADE_IN_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
+    val bottomLeftX = instance.area.bottomLeftX
+    val bottomLeftZ = instance.area.bottomLeftZ
+
+    player.moveTo(bottomLeftX + 37, bottomLeftZ + 23, 1)
+
+    val xenia = Npc(Npcs.XENIA, Tile(bottomLeftX + 37, bottomLeftZ + 23, 1), player.world)
+    val kayle = Npc(Npcs.KAYLE, Tile(bottomLeftX + 37, bottomLeftZ + 40, 1), player.world)
+    xenia.facePawn(player)
+    kayle.faceTile(Tile(bottomLeftX + 37, bottomLeftZ + 22, 1))
+    world.spawn(xenia)
+    world.spawn(kayle)
+
+    xenia.queue {
+        while (true) {
+            xenia.walkTo(player.tile, MovementQueue.StepType.FORCED_RUN)
+            wait(1)
+        }
+    }
+
+    kayle.queue {
+        wait { kayle.sees(xenia, 13) }
+        xenia.hit(1, HitType.RANGE)
+        xenia.animate(CombatAnimation.UNARMED.blockAnimation.id)
+        xenia.setCurrentLifepoints(2)
     }
 }
