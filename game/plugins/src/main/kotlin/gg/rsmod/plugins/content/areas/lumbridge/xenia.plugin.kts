@@ -1,13 +1,60 @@
 import gg.rsmod.plugins.content.quests.canStartQuest
+import gg.rsmod.plugins.content.quests.getCurrentStage
 import gg.rsmod.plugins.content.quests.impl.TheBloodPact
 import gg.rsmod.plugins.content.quests.startQuest
 import gg.rsmod.plugins.content.quests.startedQuest
 
+// Xenia outside of the catacombs
 on_npc_option(Npcs.XENIA_11476, "Talk-to") {
     player.queue {
         if (!player.startedQuest(TheBloodPact) && player.canStartQuest(TheBloodPact)) {
             this.chatNpc("I'm glad you've come by. I need some help.")
             preQuestDialogue(this)
+            return@queue
+        }
+
+        when (player.getCurrentStage(TheBloodPact)) {
+            in 1..59 -> {
+                // TODO: Find the actual dialogue when you've started the quest and talk to her outside
+                chatNpc("We've got no time to lose. You head down the stairs, and I'll follow.", wrap = true)
+            }
+        }
+    }
+}
+
+// Xenia inside the catacombs before she's injured by Kayle
+on_npc_option(Npcs.XENIA, "Talk-to") {
+    player.queue {
+        when (player.getCurrentStage(TheBloodPact)) {
+            2 -> {
+                preInjuryDialogue(this)
+            }
+        }
+    }
+}
+
+// Xenia inside the catacombs after she is injured by Kayle
+on_npc_option(Npcs.XENIA_9636, "Talk-to") {
+    player.queue {
+        when (player.getCurrentStage(TheBloodPact)) {
+            3 -> {
+                chatNpc("Ah...")
+                chatNpc(
+                    "It looks like I'm too old for this after all. You'll have to do the rest without me.",
+                    wrap = true,
+                )
+                // TODO: Actually implement the heal she talks about here...
+                chatNpc(
+                    "I'll follow you, but I'll stay out of combat. If you're badly wounded I'll be able to heal you.",
+                    wrap = true,
+                )
+                chatNpc(
+                    "The first cultist is using a ranged weapon, so you should attack him using melee. Either run " +
+                        "straight at him or make your way around the room so that he can't get a clear shot.",
+                    wrap = true,
+                )
+                postInjuryDialogue(this)
+            }
         }
     }
 }
@@ -134,6 +181,70 @@ suspend fun knowMore(task: QueueTask) {
         5 -> {
             task.chatNpc("So, will you help me, ${task.player.username}?")
             choice(task)
+        }
+    }
+}
+
+suspend fun preInjuryDialogue(task: QueueTask) {
+    when (
+        task.options(
+            "What's the plan of attack?",
+            "What's a blood pact?",
+            "Let's get on with this.",
+        )
+    ) {
+        1 -> {
+            task.chatNpc(
+                "It looks like the cultist has a bow. The best way to deal with someone with a ranged " +
+                    "weapon is to get close to them and attack with melee. ",
+                wrap = true,
+            )
+            preInjuryDialogue(task)
+        }
+        2 -> {
+            task.chatNpc(
+                "It's something Zamorakian cults do sometimes; a way of swearing loyalty to their leader.",
+                wrap = true,
+            )
+            task.chatNpc(
+                "A blood pact doesn't have real magical power, but that kind of thing can have great power " +
+                    "over a person if they believe strongly enough.",
+                wrap = true,
+            )
+            preInjuryDialogue(task)
+        }
+    }
+}
+
+suspend fun postInjuryDialogue(task: QueueTask) {
+    when (
+        task.options(
+            "Tell me more about melee combat.",
+            "Are you going to be alright?",
+            "I can handle this.",
+        )
+    ) {
+        1 -> {
+            task.chatNpc(
+                "There's not much to tell. Just run up and attack. You don't even need a weapon - you can " +
+                    "use your fists.",
+                wrap = true,
+            )
+            task.chatNpc(
+                "Melee combat is strong against most enemies, especially lightly armoured rangers. It's not" +
+                    " so good against magic-users, though.",
+                wrap = true,
+            )
+            postInjuryDialogue(task)
+        }
+        2 -> {
+            task.chatNpc("Don't worry about me. I've survived worse wounds than this.", wrap = true)
+            task.chatNpc(
+                "I'm going to hang back from combat, but I'll be here to give you advice if you need it. " +
+                    "I'm sure you can beat these cultists on your own.",
+                wrap = true,
+            )
+            postInjuryDialogue(task)
         }
     }
 }
