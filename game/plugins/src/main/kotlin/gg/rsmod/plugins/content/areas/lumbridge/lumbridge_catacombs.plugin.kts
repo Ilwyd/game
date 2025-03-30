@@ -30,7 +30,7 @@ fun initialCutscene(
     player: Player,
     instance: InstancedMap,
 ) {
-    player.lockingQueue { // TODO: Block player input during this sequence. Clicking softlocks the player
+    player.lockingQueue {
         player.openInterface(FADE_OUT_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
         wait(3)
 
