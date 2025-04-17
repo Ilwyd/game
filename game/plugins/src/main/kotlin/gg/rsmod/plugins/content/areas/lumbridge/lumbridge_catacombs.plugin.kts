@@ -31,7 +31,7 @@ fun initialCutscene(
     instance: InstancedMap,
 ) {
     player.lockingQueue {
-        player.openInterface(FADE_OUT_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
+        player.openInterface(FADE_IN_INTERFACE, InterfaceDestination.MAIN_SCREEN_OVERLAY)
         wait(3)
 
         val bottomLeftX = instance.area.bottomLeftX
