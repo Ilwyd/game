@@ -15,9 +15,9 @@ SpecialAttacks.register(
     Items.CORRUPT_DRAGON_DAGGER,
     Items.C_DRAGON_DAGGER_DEG,
 ) {
-    player.animate(id = 1062)
-    player.graphic(id = 252, height = 92)
-    player.playSound(2537)
+    player.animate(Anims.DRAGON_DAGGER_SPECIAL)
+    player.graphic(Gfx.DRAGON_DAGGER_SPECIAL, height = 92)
+    player.playSound(Sfx.PUNCTURE)
 
     for (i in 0 until 2) {
         val maxHit = MeleeCombatFormula.getMaxHit(player, target, specialAttackMultiplier = 1.15)

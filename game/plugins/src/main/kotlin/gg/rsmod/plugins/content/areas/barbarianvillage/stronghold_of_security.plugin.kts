@@ -446,13 +446,13 @@ suspend fun gateSecurityQuestion(
                     facialExpression = FacialExpression.OLD_NORMAL,
                     wrap = true,
                 )
-                it.player.animate(4282)
+                it.player.animate(Anims.SOS_THROUGH_DOOR)
                 it.player.playSound(Sfx.SOS_THROUGH_DOOR)
                 it.wait(3)
                 it.player.playSound(getDoorSFX(obj.id))
                 moveThroughDoor(it, player, obj)
                 it.wait(1)
-                it.player.animate(4283)
+                it.player.animate(Anims.SOS_LOOK_AROUND)
             }
             else -> {
                 it.chatNpc(
@@ -465,12 +465,12 @@ suspend fun gateSecurityQuestion(
         }
     } else {
         // Skip Question in Dangerous Area or Completed Floor
-        it.player.animate(4282)
+        it.player.animate(Anims.SOS_THROUGH_DOOR)
         it.wait(2)
         it.player.playSound(getDoorSFX(obj.id))
         moveThroughDoor(it, player, obj)
         it.wait(1)
-        it.player.animate(4283)
+        it.player.animate(Anims.SOS_LOOK_AROUND)
     }
 }
 
@@ -526,7 +526,7 @@ fun moveThroughDoor(
 on_obj_option(obj = Objs.DEAD_EXPLORER, option = "search") {
     if (!player.hasItem(Items.STRONGHOLD_NOTES) && player.inventory.hasSpace) {
         player.inventory.add(Items.STRONGHOLD_NOTES)
-        player.animate(881)
+        player.animate(Anims.PICKPOCKET)
     }
 }
 
@@ -729,7 +729,7 @@ on_obj_option(obj = Objs.GIFT_OF_PEACE, option = "open") {
             )
             player.playSound(Sfx.SOS_CHOIR)
             player.inventory.add(Items.COINS_995, 2000)
-            player.setVarp(802, 1)
+            player.setVarp(Varps.STRONGHOLD_OF_SECURITY_PROGRESS, 1)
             completeFloor(player, 1)
         } else if (!player.inventory.hasSpace) {
             messageBox("You don't have enough free space in your inventory.")
@@ -752,7 +752,7 @@ on_obj_option(obj = Objs.GRAIN_OF_PLENTY, option = "search") {
             player.playSound(Sfx.SOS_SACK)
             player.playSound(Sfx.SOS_CHOIR)
             player.inventory.add(Items.COINS_995, 3000)
-            player.setVarp(802, 3)
+            player.setVarp(Varps.STRONGHOLD_OF_SECURITY_PROGRESS, 3)
             completeFloor(player, 2)
         } else if (!player.inventory.hasSpace) {
             messageBox("You don't have enough free space in your inventory.")
@@ -774,7 +774,7 @@ on_obj_option(obj = Objs.BOX_OF_HEALTH, option = "open") {
             )
             player.playSound(Sfx.SOS_CHOIR)
             player.inventory.add(Items.COINS_995, 5000)
-            player.setVarp(802, 7)
+            player.setVarp(Varps.STRONGHOLD_OF_SECURITY_PROGRESS, 7)
             completeFloor(player, 3)
         } else if (!player.inventory.hasSpace) {
             messageBox("You don't have enough free space in your inventory.")
@@ -822,7 +822,7 @@ on_obj_option(obj = Objs.CRADLE_OF_LIFE, option = "search") {
                     }
                 }
                 player.playSound(Sfx.SOS_CHOIR)
-                player.setVarp(802, 15)
+                player.setVarp(Varps.STRONGHOLD_OF_SECURITY_PROGRESS, 15)
                 completeFloor(player, 4)
             } else {
                 messageBox("You have already claimed your reward from this level.")

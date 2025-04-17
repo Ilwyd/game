@@ -16,7 +16,7 @@ val deathSpawn =
 table.register(deathSpawn, *ids)
 
 on_npc_spawn(npc = Npcs.DEATH_SPAWN) {
-    npc.graphic(827, 0)
+    npc.graphic(Gfx.DEATH_SPAWN_SPAWN, 0)
 }
 
 on_npc_pre_death(*ids) {
@@ -51,9 +51,9 @@ ids.forEach {
             defenceRanged = 20
         }
         anims {
-            attack = 9459
-            death = 9460
-            block = 9461
+            attack = Anims.DEATH_SPAWN_ATTACK
+            death = Anims.DEATH_SPAWN_DEATH
+            block = Anims.DEATH_SPAWN_BLOCK
         }
     }
 }

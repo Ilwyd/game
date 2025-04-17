@@ -250,8 +250,8 @@ on_timer(TRANSFORM_TIMER) {
     if (npc.isActive() && npc.lock.canMove()) {
         val male = npc.getTransmogId() != Npcs.MAKEOVER_MAGE
         npc.setTransmogId(if (male) Npcs.MAKEOVER_MAGE else npc.id)
-        npc.graphic(id = 110, height = 60, delay = 15)
-        npc.animate(1161)
+        npc.graphic(Gfx.CURSE_SPELL_TARGET_EFFECT, height = 60, delay = 15)
+        npc.animate(Anims.MAKEOVER_SPELL_CAST)
         npc.forceChat(if (male) "Ahah!" else "Ooh!")
     }
     npc.timers[TRANSFORM_TIMER] = world.random(DELAY)

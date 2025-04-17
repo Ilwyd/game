@@ -14,27 +14,27 @@ val demonForm = Npcs.KOLODION_911
 
 on_npc_spawn(npc = humanForm) {
     npc.forceChat("You must prove yourself... now!")
-    npc.graphic(267, 100)
+    npc.graphic(Gfx.MAGEARENA_TRANSFORM_POOF, 100)
 }
 
 on_npc_spawn(npc = ogreForm) {
     npc.forceChat("This is only the beginning; you can't beat me!")
-    npc.graphic(267, 100)
+    npc.graphic(Gfx.MAGEARENA_TRANSFORM_POOF, 100)
 }
 
 on_npc_spawn(npc = trollForm) {
     npc.forceChat("Foolish mortal; I am unstoppable.")
-    npc.graphic(267, 100)
+    npc.graphic(Gfx.MAGEARENA_TRANSFORM_POOF, 100)
 }
 
 on_npc_spawn(npc = darkBeastForm) {
     npc.forceChat("Now you feel it... The dark energy.")
-    npc.graphic(267, 100)
+    npc.graphic(Gfx.MAGEARENA_TRANSFORM_POOF, 100)
 }
 
 on_npc_spawn(npc = demonForm) {
     npc.forceChat("Aaaaaaaarrgghhhh! The power!")
-    npc.graphic(267, 100)
+    npc.graphic(Gfx.MAGEARENA_TRANSFORM_POOF, 100)
 }
 
 val ids = intArrayOf(Npcs.KOLODION_907)
@@ -51,7 +51,7 @@ table.register(wizard, *ids)
 
 on_npc_death(humanForm) {
     world.spawn(Npc(ogreForm, npc.tile, world))
-    npc.graphic(308, 100)
+    npc.graphic(Gfx.MAGEARENA_TELEPORT_BALL, 100)
 }
 
 on_npc_death(ogreForm) {
@@ -246,9 +246,9 @@ fun stepIntoPool(
                 2 -> p.faceTile(obj.tile, 3, 3)
                 3 -> wait(1)
                 4 -> p.moveTo(2542, 4720, 0)
-                5 -> p.animate(7269)
+                5 -> p.animate(Anims.MA_JUMP_POOL)
                 6 -> {
-                    p.graphic(68)
+                    p.graphic(Gfx.GIANT_WATER_SPLASH)
                     p.resetRenderAnimation()
                 }
                 7 -> p.moveTo(2509, 4689)
@@ -276,9 +276,9 @@ fun stepIntoPool2(
                 2 -> p.faceTile(obj.tile, 3, 3)
                 3 -> wait(1)
                 4 -> p.moveTo(2509, 4687, 0)
-                5 -> p.animate(7269)
+                5 -> p.animate(Anims.MA_JUMP_POOL)
                 6 -> {
-                    p.graphic(68)
+                    p.graphic(Gfx.GIANT_WATER_SPLASH)
                     p.resetRenderAnimation()
                 }
                 7 -> p.moveTo(2542, 4718)
@@ -306,14 +306,14 @@ fun prayToSaradomin(
                 2 -> p.faceTile(obj.tile)
                 3 -> {
                     messageBox("You kneel and begin to chant to Saradomin.")
-                    p.animate(645)
+                    p.animate(Anims.ALTAR_PRAY)
                 }
                 4 -> wait(1)
                 5 -> {
                     val floorSpawnTile = Tile(x = 2500, z = 4720)
                     val SARADOMIN_CAPE = GroundItem(Items.SARADOMIN_CAPE, 1, Tile(x = 2500, z = 4720, 0))
                     player.world.spawn(SARADOMIN_CAPE)
-                    player.world.spawn(TileGraphic(floorSpawnTile, id = 189, height = 0))
+                    player.world.spawn(TileGraphic(floorSpawnTile, id = Gfx.SMALL_SMOKE_POOF, height = 0))
                 }
                 6 -> {
                     p.unlock()
@@ -339,14 +339,14 @@ fun prayToGuthix(
                 2 -> p.faceTile(obj.tile)
                 3 -> {
                     messageBox("You kneel and begin to chant to Guthix.")
-                    p.animate(645)
+                    p.animate(Anims.ALTAR_PRAY)
                 }
                 4 -> wait(1)
                 5 -> {
                     val floorSpawnTile = Tile(x = 2507, z = 4723)
                     val GUTHIX_CAPE = GroundItem(Items.GUTHIX_CAPE, 1, Tile(x = 2507, z = 4723, 0))
                     player.world.spawn(GUTHIX_CAPE)
-                    player.world.spawn(TileGraphic(floorSpawnTile, id = 189, height = 0))
+                    player.world.spawn(TileGraphic(floorSpawnTile, id = Gfx.SMALL_SMOKE_POOF, height = 0))
                 }
                 6 -> {
                     p.unlock()
@@ -372,14 +372,14 @@ fun prayToZamorak(
                 2 -> p.faceTile(obj.tile)
                 3 -> {
                     messageBox("You kneel and begin to chant to Zamorak.")
-                    p.animate(645)
+                    p.animate(Anims.ALTAR_PRAY)
                 }
                 4 -> wait(1)
                 5 -> {
                     val floorSpawnTile = Tile(x = 2516, z = 4720)
                     val ZAMORAK_CAPE = GroundItem(Items.ZAMORAK_CAPE, 1, Tile(x = 2516, z = 4720, 0))
                     player.world.spawn(ZAMORAK_CAPE)
-                    player.world.spawn(TileGraphic(floorSpawnTile, id = 189, height = 0))
+                    player.world.spawn(TileGraphic(floorSpawnTile, id = Gfx.SMALL_SMOKE_POOF, height = 0))
                 }
                 6 -> {
                     p.unlock()

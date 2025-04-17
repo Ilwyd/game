@@ -17,17 +17,17 @@ import gg.rsmod.game.model.shop.PurchasePolicy
 import gg.rsmod.game.model.timer.SKULL_ICON_DURATION_TIMER
 import gg.rsmod.game.sync.block.UpdateBlockType
 import gg.rsmod.plugins.api.*
-import gg.rsmod.plugins.api.cfg.Items
-import gg.rsmod.plugins.api.cfg.Sfx
+import gg.rsmod.plugins.api.cfg.*
 import gg.rsmod.plugins.content.combat.createProjectile
 import gg.rsmod.plugins.content.combat.strategy.MagicCombatStrategy
 import gg.rsmod.plugins.content.mechanics.music.RegionMusicService
-import gg.rsmod.plugins.content.quests.QUEST_POINT_VARP
 import gg.rsmod.plugins.content.quests.Quest
 import gg.rsmod.plugins.content.skills.crafting.jewellery.JewelleryData
 import gg.rsmod.plugins.content.skills.crafting.silver.SilverData
 import gg.rsmod.plugins.content.skills.farming.constants.Constants
 import gg.rsmod.plugins.content.skills.farming.logic.FarmingManager
+import gg.rsmod.plugins.content.skills.slayer.data.SlayerMaster
+import gg.rsmod.plugins.content.skills.slayer.getSlayerAssignment
 import gg.rsmod.plugins.content.skills.smithing.data.BarProducts
 import gg.rsmod.plugins.content.skills.smithing.data.BarType
 import gg.rsmod.plugins.content.skills.smithing.data.SmithingType
@@ -50,26 +50,17 @@ const val INVENTORY_INTERFACE_KEY = 93
  */
 const val INTERFACE_INV_INIT_BIG = 150
 
-const val MAKE_QUANTITY_VARBIT = 8095
-
-const val MAKE_MAX_QUANTITY_VARBIT = 8094
-
-// Constants representing VARP ids for various containers and currencies
-const val CURRENT_CONTAINER_ID_VARP = 118
-const val SECONDARY_CONTAINER_ID_VARP = 1496
-const val SHOP_CURRENCY_VARP = 532
-
 fun openCharacterCustomizing(player: Player) {
     player.openFullscreenInterface(1028)
     player.setEvents(interfaceId = 1028, component = 65, to = 11)
     player.setEvents(interfaceId = 1028, component = 128, to = 50)
     player.setEvents(interfaceId = 1028, component = 132, to = 250)
-    player.setVarbit(8093, if (player.appearance.gender == Gender.MALE) 0 else 1)
+    player.setVarbit(Varbits.CUSTOMIZATION_GENDER, if (player.appearance.gender == Gender.MALE) 0 else 1)
     player.setVarc(197, 0)
     player.runClientScript(368, "str2")
     // script_368(widget(1028, 116), str2, getTextWidth(str2, 495) + 30, "");
-    // player.setVarbit(8246, 1)
-    // player.setVarbit(8247, 0)
+    // player.setVarbit(Varbits.VARBIT_8246, 1)
+    // player.setVarbit(Varbits.VARBIT_8247, 0)
     // player.setComponentText(interfaceId = 1028, component = 115, text = "Modify Further")
 }
 
@@ -93,18 +84,18 @@ fun Player.openShop(
         attr[CURRENT_SHOP_ATTR] = currentShop
 
         // Set the main stock container id
-        setVarp(CURRENT_CONTAINER_ID_VARP, 4)
+        setVarp(Varps.CURRENT_CONTAINER_ID, 4)
 
         // Set the secondary container id if the shop contains samples, otherwise set to -1
         if (currentShop.containsSamples) {
-            setVarp(SECONDARY_CONTAINER_ID_VARP, 6)
+            setVarp(Varps.SECONDARY_CONTAINER_ID, 6)
         } else {
-            setVarp(SECONDARY_CONTAINER_ID_VARP, -1)
+            setVarp(Varps.SECONDARY_CONTAINER_ID, -1)
         }
 
         // Set the currency for the shop
         if (currentShop.currency.currencyItem > -1) {
-            setVarp(SHOP_CURRENCY_VARP, currentShop.currency.currencyItem)
+            setVarp(Varps.SHOP_CURRENCY, currentShop.currency.currencyItem)
         }
 
         shopDirty = true
@@ -626,7 +617,7 @@ fun Player.playSong(
         world.definitions
             .get(EnumDef::class.java, 1351)
             .getKeyForValue(id)
-    setVarbit(4388, index)
+    setVarbit(Varbits.CURRENT_SONG_INDEX, index)
 }
 
 /**
@@ -680,7 +671,7 @@ fun Player.addSongToPlaylist(interfaceSlot: Int) {
     if (slot % 2 != 0) slot -= 1
 
     val trackIndex = slot / 2
-    val playlistVarbit = (7081..7092).first { getVarbit(it) == 32767 }
+    val playlistVarbit = (Varbits.PLAYLIST_SLOT_1..Varbits.PLAYLIST_SLOT_12).first { getVarbit(it) == 32767 }
     setVarbit(playlistVarbit, trackIndex)
 }
 
@@ -702,16 +693,19 @@ fun Player.removeSongFromPlaylist(
     if (fromTrackList) {
         if (playlistSlot % 2 != 0) playlistSlot -= 1
         playlistSlot /= 2
-        playlistSlot = (7081..7092).indexOfFirst { getVarbit(it) == playlistSlot }
+        playlistSlot =
+            (Varbits.PLAYLIST_SLOT_1..Varbits.PLAYLIST_SLOT_12).indexOfFirst {
+                getVarbit(it) == playlistSlot
+            }
     } else {
         if (playlistSlot > 11) playlistSlot -= 12
     }
     (playlistSlot..11).forEach {
         if (it == 11) {
-            setVarbit(7081 + it, -1)
+            setVarbit(Varbits.PLAYLIST_SLOT_1 + it, -1)
             return@forEach
         }
-        setVarbit(7081 + it, getVarbit(7081 + it + 1))
+        setVarbit(Varbits.PLAYLIST_SLOT_1 + it, getVarbit(Varbits.PLAYLIST_SLOT_1 + it + 1))
     }
 }
 
@@ -719,7 +713,7 @@ fun Player.removeSongFromPlaylist(
  * Sets all the [Player]s playlist varbits to -1 (Underflows to 32767)
  */
 fun Player.clearPlaylist() {
-    (7081..7092).forEach {
+    (Varbits.PLAYLIST_SLOT_1..Varbits.PLAYLIST_SLOT_12).forEach {
         setVarbit(it, -1)
     }
 }
@@ -728,14 +722,15 @@ fun Player.clearPlaylist() {
  * Flips the [Player]s playlist varbit to 0 or 1
  */
 fun Player.togglePlaylist() {
-    setVarbit(7078, getVarbit(7078) + 1) // value of 2 overflows back to 0
+    setVarbit(Varbits.TOGGLE_PLAYLIST, getVarbit(Varbits.TOGGLE_PLAYLIST) + 1) // value of 2 overflows back to 0
 }
 
 /**
  * Flips the [Player]s playlist shuffle varbit to 0 or 1
  */
 fun Player.togglePlaylistShuffle() {
-    setVarbit(7079, getVarbit(7079) + 1) // value of 2 overflows back to 0
+    // value of 2 overflows back to 0
+    setVarbit(Varbits.TOGGLE_PLAYLIST_SHUFFLE, getVarbit(Varbits.TOGGLE_PLAYLIST_SHUFFLE) + 1)
 }
 
 fun Player.getVarp(id: Int): Int = varps.getState(id)
@@ -820,6 +815,10 @@ fun Player.clearMapFlag() {
     setMapFlag(255, 255)
 }
 
+fun Player.setMinimapState(state: Int) {
+    write(MinimapToggleMessage(state))
+}
+
 fun Player.sendOption(
     option: String,
     id: Int,
@@ -891,19 +890,19 @@ fun Player.restorePrayer(
     alterPrayerPoints(value = amount, capValue = capValue)
 }
 
-fun Player.hasSpellbook(book: Spellbook): Boolean = getVarbit(4070) == book.id
+fun Player.hasSpellbook(book: Spellbook): Boolean = getVarbit(Varbits.SPELLBOOK) == book.id
 
-fun Player.getSpellbook(): Spellbook = Spellbook.values.first { getVarbit(4070) == it.id }
+fun Player.getSpellbook(): Spellbook = Spellbook.values.first { getVarbit(Varbits.SPELLBOOK) == it.id }
 
-fun Player.setSpellbook(book: Spellbook) = setVarbit(4070, book.id)
+fun Player.setSpellbook(book: Spellbook) = setVarbit(Varbits.SPELLBOOK, book.id)
 
 fun Player.getWeaponType(): Int = attr[LAST_KNOWN_WEAPON_TYPE] ?: 0
 
-fun Player.getMaximumMakeQuantity(): Int = getVarbit(MAKE_MAX_QUANTITY_VARBIT)
+fun Player.getMaximumMakeQuantity(): Int = getVarbit(Varbits.MAKE_MAX_QUANTITY)
 
-fun Player.getMakeQuantity(): Int = getVarbit(MAKE_QUANTITY_VARBIT)
+fun Player.getMakeQuantity(): Int = getVarbit(Varbits.MAKE_QUANTITY)
 
-fun Player.getAttackStyle(): Int = getVarp(43)
+fun Player.getAttackStyle(): Int = getVarp(Varps.ATTACK_STYLE)
 
 fun Player.hasWeaponType(
     type: WeaponType,
@@ -1314,15 +1313,15 @@ fun essenceTeleport(
     npc.queue {
         npc.facePawn(npc.getInteractingPlayer())
         npc.forceChat(dialogue)
-        npc.graphic(108)
-        val projectile = npc.createProjectile(p, 109, ProjectileType.MAGIC)
+        npc.graphic(Gfx.CURSE_SPELL)
+        val projectile = npc.createProjectile(p, Gfx.CURSE_SPELL_PROJ, ProjectileType.MAGIC)
         p.world.spawn(projectile)
         p.playSound(Sfx.CURSE_CAST_AND_FIRE)
         wait(MagicCombatStrategy.getHitDelay(npc.tile, p.tile) + 1)
         p.attr[ESSENCE_MINE_INTERACTED_WITH] = npc.id
         p.moveTo(targetTile)
         wait(1)
-        p.graphic(110)
+        p.graphic(Gfx.CURSE_SPELL_TARGET_EFFECT)
         p.playSound(Sfx.CURSE_HIT)
     }
 }
@@ -1357,7 +1356,7 @@ fun Player.getMagicDamageBonus(): Int = equipmentBonuses[BonusSlot.MAGIC_DAMAGE_
 fun Player.getPrayerBonus(): Int = equipmentBonuses[BonusSlot.PRAYER_BONUS.id]
 
 fun Player.completedAllQuests(): Boolean {
-    return getVarp(QUEST_POINT_VARP) >= Quest.quests.sumOf { it.pointReward }
+    return getVarp(Varps.QUEST_POINTS) >= Quest.quests.sumOf { it.pointReward }
 }
 
 fun Player.checkEquipment() {
@@ -1404,17 +1403,17 @@ fun Player.setSkillTargetValue(
 
 fun Player.refreshSkillTarget() {
     val value: Int = Misc.get32BitValue(enabledSkillTarget, true)
-    setVarp(1966, value)
+    setVarp(Varps.SKILL_TARGETS_SET, value)
 }
 
 fun Player.refreshSkillTargetMode() {
     val value: Int = Misc.get32BitValue(skillTargetMode, true)
-    setVarp(1968, value)
+    setVarp(Varps.SKILL_TARGET_MODES, value)
 }
 
 fun Player.refreshSkillsTargetsValues() {
     for (i in 0..24) {
-        setVarp(1969 + i, skillTargetValue[i])
+        setVarp(Varps.SKILL_TARGET_ATTACK + i, skillTargetValue[i])
     }
 }
 
@@ -1445,7 +1444,7 @@ fun Player.handleLadder(
 ) {
     val climbUp = getInteractingGameObj().getDef(world.definitions).options.any { it?.lowercase() == "climb-up" }
     queue {
-        animate(828, idleOnly = true)
+        animate(Anims.LADDER_CLIMB, idleOnly = true)
         wait(2)
         val zOffset =
             when (climbUp) {
@@ -1520,13 +1519,18 @@ fun Player.openJewelleryCraftingInterface() {
 
     /**
      * Hide of show model/option components according to if the player has the required items or not.
-     * TODO Handle slayer ring slayer unlock and add accordingly.
      */
     if (inventory.contains(Items.GOLD_BAR)) {
         JewelleryData.values.forEach { data ->
-            data.products.forEach { product ->
+            data.products.forEach product@{ product ->
                 if (data != JewelleryData.GOLD) {
-                    if (inventory.contains(data.gemRequired) && data != JewelleryData.SLAYER_RING) {
+                    if (inventory.contains(data.gemRequired)) {
+                        if (data == JewelleryData.SLAYER_RING &&
+                            attr[CRAFT_ROS] != true
+                        ) {
+                            return@product
+                        }
+
                         setComponentItem(
                             interfaceId = 446,
                             component = product.modelComponent,
@@ -1548,6 +1552,63 @@ fun Player.openJewelleryCraftingInterface() {
             }
         }
     }
+}
+
+fun Player.contactSlayerMaster(fromRing: Boolean = false) {
+    if (!attr.has(SLAYER_MASTER)) {
+        message("You try to activate the gem; but get no response.")
+        return
+    }
+
+    val master = SlayerMaster.values().firstOrNull { it.id == attr[SLAYER_MASTER] } ?: return
+    queue {
+        chatNpc("Hello there ${Misc.formatForDisplay(username)}, what can I help you with?", npc = master.id)
+        when (options("How am I doing so far?", "Who are you?", "Where are you?", "Nothing really.")) {
+            FIRST_OPTION -> {
+                chatPlayer("How am I doing so far?")
+                // TODO: Confirm this is the "point text" in 2011 - Taken from OSRS
+                val pointText = if (fromRing) " Your reward point tally is ${attr[SLAYER_POINTS]}." else ""
+                if (getSlayerAssignment() == null) {
+                    chatNpc(
+                        "You need something new to hunt. Come and see me when you can and I'll give you a new task." +
+                            pointText,
+                        wrap = true,
+                        npc = master.id,
+                    )
+                } else {
+                    chatNpc(
+                        "You're currently assigned to kill ${getSlayerAssignment()!!.identifier.lowercase()}; only " +
+                            "${attr[SLAYER_AMOUNT]} more to go." + pointText,
+                        wrap = true,
+                        npc = master.id,
+                    )
+                }
+            }
+            SECOND_OPTION -> {
+                chatPlayer("Who are you?")
+                chatNpc("My name's ${master.identifier}; I'm a Slayer Master.", npc = master.id)
+            }
+            THIRD_OPTION -> {
+                // TODO: Add more options for this when adding more slayer masters
+                chatPlayer("Where are you?")
+                chatNpc("You'll find me in Burthorpe. I'll be here when you need a", "new task.", npc = master.id)
+            }
+            FOURTH_OPTION -> {
+                chatPlayer("Nothing really.")
+            }
+        }
+    }
+}
+
+fun Player.getSlayerKillsRemaining() {
+    if (getSlayerAssignment() == null) {
+        message("You currently do not have a task; speak to a Slayer Master to receive one.")
+        return
+    }
+    message(
+        "Your current assignment is ${getSlayerAssignment()!!.identifier.lowercase()}; only ${attr[SLAYER_AMOUNT]} " +
+            "more to go.",
+    )
 }
 
 /**
