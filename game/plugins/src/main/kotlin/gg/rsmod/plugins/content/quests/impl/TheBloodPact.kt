@@ -3,6 +3,8 @@ package gg.rsmod.plugins.content.quests.impl
 import gg.rsmod.game.model.entity.Player
 import gg.rsmod.plugins.api.Skills
 import gg.rsmod.plugins.api.cfg.Items
+import gg.rsmod.plugins.api.cfg.Varbits
+import gg.rsmod.plugins.api.cfg.Varps
 import gg.rsmod.plugins.api.ext.getVarp
 import gg.rsmod.plugins.api.ext.setVarp
 import gg.rsmod.plugins.content.quests.*
@@ -21,7 +23,7 @@ object TheBloodPact : Quest( // Adds Quest Info
         "1 Quest Point; a sword, chargebow, and magic staff; 100 Attack, Strength, Defence, Ranged and Magic " +
             "XP; access to the Lumbridge Catacombs dungeon",
     pointReward = 1,
-    questId = 7238,
+    questId = Varbits.THE_BLOOD_PACT_PROGRESS,
     usesVarbits = true,
     spriteId = 3176,
     slot = 170,
@@ -51,7 +53,7 @@ object TheBloodPact : Quest( // Adds Quest Info
         player.addXp(Skills.DEFENCE, 100.0)
         player.addXp(Skills.RANGED, 100.0)
         player.addXp(Skills.MAGIC, 100.0)
-        player.setVarp(QUEST_POINT_VARP, player.getVarp(QUEST_POINT_VARP).plus(pointReward))
+        player.setVarp(Varps.QUEST_POINTS, player.getVarp(Varps.QUEST_POINTS).plus(pointReward))
         player.buildQuestFinish(
             this,
             item = Items.REESES_SWORD,
